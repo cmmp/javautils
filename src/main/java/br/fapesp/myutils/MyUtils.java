@@ -2,6 +2,7 @@ package br.fapesp.myutils;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Random;
 
 import javax.management.RuntimeErrorException;
 import javax.swing.JComponent;
@@ -9,7 +10,9 @@ import javax.swing.JFrame;
 
 import org.apache.commons.math3.util.MathArrays;
 
+import weka.core.Attribute;
 import weka.core.FastVector;
+import weka.core.Instance;
 import weka.core.Instances;
 
 /**
@@ -19,6 +22,66 @@ import weka.core.Instances;
  * 
  */
 public class MyUtils {
+	
+	/**
+	 * Generates a Gaussian data set with K clusters and m dimensions 
+	 * @param centers K x m matrix
+	 * @param sigmas K x m matrix
+	 * @param pointsPerCluster number of points per cluster
+	 * @param seed for the RNG
+	 * @param randomize should the order of the instances be randomized?
+	 * @param supervised should class label be present? if true, the class is the m+1 attribute
+	 * 
+	 * @return
+	 */
+	public static Instances genGaussianDataset(double[][] centers, double[][] sigmas, int pointsPerCluster, long seed, boolean randomize, boolean supervised) {
+		Random r = new Random(seed);
+		
+		int K = centers.length; // number of clusters
+		int m = centers[0].length; // number of dimensions
+		
+		FastVector atts = new FastVector(m);
+		for(int i = 0; i < m; i++)
+			atts.addElement(new Attribute("at" + i));
+		
+		if(supervised) {
+			FastVector cls = new FastVector(K);
+			for(int i = 0; i < K; i++) cls.addElement("Gauss-" + i);
+			atts.addElement(new Attribute("Class", cls));
+		}
+		
+		Instances data;
+		if (supervised)
+			data = new Instances(K + "-Gaussians-supervised", atts, K * pointsPerCluster);
+		else
+			data = new Instances(K + "-Gaussians", atts, K * pointsPerCluster);
+		
+		if(supervised)
+			data.setClassIndex(m);
+			
+		Instance ith;
+		
+		for(int i = 0; i < K ; i++) {
+			for(int j = 0; j < pointsPerCluster; j++) {
+				if(!supervised)
+					ith = new Instance(m);
+				else
+					ith = new Instance(m+1);
+				ith.setDataset(data);
+				for(int k = 0; k < m; k++) 
+					ith.setValue(k, centers[i][k] + (r.nextGaussian() * sigmas[i][k]));
+				if (supervised)
+					ith.setValue(m, "Gauss-" + i);
+				data.add(ith);
+			}
+		}
+		
+		// run randomization filter if desired
+		if(randomize)
+			data.randomize(r);
+		
+		return data;
+	}
 	
 	/**
 	 * Generates an integer sequence of the form (start, start+1, ..., start + nsteps - 1)

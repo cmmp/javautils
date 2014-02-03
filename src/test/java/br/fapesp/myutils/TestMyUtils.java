@@ -4,7 +4,19 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import weka.core.Instances;
+
 public class TestMyUtils {
+	
+	@Test
+	public void testGenGaussian() {
+		Instances in = MyUtils.genGaussianDataset(new double[][] {{0,0,0},{10,10,20}}, new double[][] {{1,1,2},{1,1,3}}, 30, 1234, true, false);
+		assertEquals(60, in.numInstances());
+		assertEquals(3, in.numAttributes());
+		in = MyUtils.genGaussianDataset(new double[][] {{0,0,0},{10,10,20}}, new double[][] {{1,1,2},{1,1,3}}, 30, 1234, true, true);
+		assertEquals(60, in.numInstances());
+		assertEquals(4, in.numAttributes());
+	}
 
 	@Test
 	public void testLinspace() {
