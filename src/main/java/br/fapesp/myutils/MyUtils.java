@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 
-import javax.management.RuntimeErrorException;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
