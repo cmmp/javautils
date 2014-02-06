@@ -2,11 +2,15 @@ package br.fapesp.myutils;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.MathArrays;
 
 import weka.core.Attribute;
@@ -23,6 +27,124 @@ import weka.filters.unsupervised.attribute.Remove;
  * 
  */
 public class MyUtils {
+	
+	/**
+	 * Create an array of val repeated n times
+	 * @param val
+	 * @param n
+	 * @return
+	 */
+	public static int[] repeat(int val, int n) {
+		int[] x = new int[n];
+		for(int i = 0; i < n; i++)
+			x[i] = val;
+		return x;
+	}
+	
+	/**
+	 * Compute the sum of the array x
+	 * @param x
+	 * @return
+	 */
+	public static int sum(int[] x) {
+		int sum = 0;
+		for(int i = 0; i < x.length; i++)
+			sum += x[i];
+		return sum;
+	}
+	
+	/**
+	 * Returns nsamples from values, chosen randomly _without_ replacement.
+	 * @param values
+	 * @param nsamples
+	 * @param rng optional random number generator
+	 * @param seed if no rng is passed, create one with this seed
+	 * @return
+	 */
+	public static double[] sampleWithoutReplacement(double[] values, int nsamples, Random rng, long seed) {
+		if (nsamples > values.length)
+			throw new RuntimeException("Requested sampling of more values than are available in array!");
+		double[] samples = new double[nsamples];
+		ArrayList<Double> al = new ArrayList<Double>();
+		
+		for(int i = 0; i < values.length; i++) al.add(values[i]);
+		
+		for(int i = 0; i < nsamples; i++) 
+			samples[i] = al.remove(rng.nextInt(al.size()));
+		
+		return samples;
+	}
+	
+	/**
+	 * Returns nsamples from values, chosen randomly _without_ replacement.
+	 * @param values
+	 * @param nsamples
+	 * @param rng optional random number generator
+	 * @param seed if no rng is passed, create one with this seed
+	 * @return
+	 */
+	public static int[] sampleWithoutReplacement(int[] values, int nsamples, Random rng, long seed) {
+		if (nsamples > values.length)
+			throw new RuntimeException("Requested sampling of more values than are available in array!");
+		int[] samples = new int[nsamples];
+		ArrayList<Integer> al = new ArrayList<Integer>();
+		
+		for(int i = 0; i < values.length; i++) al.add(values[i]);
+		
+		for(int i = 0; i < nsamples; i++) 
+			samples[i] = al.remove(rng.nextInt(al.size()));
+		
+		return samples;
+	}
+	
+	/**
+	 * Returns nsamples from values, chosen randomly _with_ replacement.
+	 * @param values
+	 * @param nsamples
+	 * @param rng optional random number generator
+	 * @param seed if no rng is passed, create one with this seed
+	 * @return
+	 */
+	public static double[] sampleWithReplacement(double[] values, int nsamples, Random rng, long seed) {
+		Random r;
+		double[] samples = new double[nsamples];
+		
+		if(rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		
+		for(int i = 0; i < nsamples; i++) {
+			samples[i] = values[r.nextInt(values.length)];
+		}
+		
+		return samples;
+	}
+	
+	/**
+	 * Returns nsamples from values, chosen randomly _with_ replacement.
+	 * @param values
+	 * @param nsamples
+	 * @param rng optional random number generator
+	 * @param seed if no rng is passed, create one with this seed
+	 * @return
+	 */
+	public static int[] sampleWithReplacement(int[] values, int nsamples, Random rng, long seed) {
+		Random r;
+		int[] samples = new int[nsamples];
+		
+		if(rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		
+		for(int i = 0; i < nsamples; i++) {
+			samples[i] = values[r.nextInt(values.length)];
+		}
+		
+		return samples;
+	}
+	
 
 	/**
 	 * Remove supervision from a data set
