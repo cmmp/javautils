@@ -22,6 +22,16 @@ import weka.core.Instances;
  */
 public class MyUtils {
 	
+	public static Instances genGaussianDatasetWithSigmaEvolution(double[][] centers, double[][] sigmas, double[][] sigmas2, int pointsPerCluster, long seed, boolean randomize) {
+		Instances dataset1 = genGaussianDataset(centers, sigmas, pointsPerCluster, seed, randomize, false);
+		Instances dataset2 = genGaussianDataset(centers, sigmas2, pointsPerCluster, seed + 59387, randomize, false);
+		
+		for(int i = 0; i < dataset2.numInstances(); i++)
+			dataset1.add(dataset2.instance(i));
+		
+		return dataset1;
+	}
+	
 	/**
 	 * Generates a Gaussian data set with K clusters and m dimensions 
 	 * @param centers K x m matrix
