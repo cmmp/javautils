@@ -13,6 +13,8 @@ import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Remove;
 
 /**
  * Utility class with many auxiliary methods.
@@ -21,79 +23,126 @@ import weka.core.Instances;
  * 
  */
 public class MyUtils {
-	
-	public static Instances genGaussianDatasetWithSigmaEvolution(double[][] centers, double[][] sigmas, double[][] sigmas2, int pointsPerCluster, long seed, boolean randomize) {
-		Instances dataset1 = genGaussianDataset(centers, sigmas, pointsPerCluster, seed, randomize, false);
-		Instances dataset2 = genGaussianDataset(centers, sigmas2, pointsPerCluster, seed + 59387, randomize, false);
+
+	/**
+	 * Remove supervision from a data set
+	 * 
+	 * @param dataset
+	 *            an Instances data set
+	 * @param classIndex
+	 *            if -1 use the last attribute
+	 * @return a new copy of the data set with supervision removed
+	 */
+	public static Instances removeSupervision(Instances dataset, int classIndex) {
+		Instances unsupervised = new Instances(dataset);
+		String index = classIndex == -1 ? "last" : String.valueOf(classIndex);
 		
-		for(int i = 0; i < dataset2.numInstances(); i++)
+		// Use the Remove filter to delete supervision from the data set:
+		Remove rm = new Remove();
+		rm.setAttributeIndices(index);
+
+		try {
+			rm.setInputFormat(unsupervised);
+			unsupervised = Filter.useFilter(unsupervised, rm);
+			return unsupervised;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+
+	public static Instances genGaussianDatasetWithSigmaEvolution(
+			double[][] centers, double[][] sigmas, double[][] sigmas2,
+			int pointsPerCluster, long seed, boolean randomize) {
+		Instances dataset1 = genGaussianDataset(centers, sigmas,
+				pointsPerCluster, seed, randomize, false);
+		Instances dataset2 = genGaussianDataset(centers, sigmas2,
+				pointsPerCluster, seed + 59387, randomize, false);
+
+		for (int i = 0; i < dataset2.numInstances(); i++)
 			dataset1.add(dataset2.instance(i));
-		
+
 		return dataset1;
 	}
-	
+
 	/**
-	 * Generates a Gaussian data set with K clusters and m dimensions 
-	 * @param centers K x m matrix
-	 * @param sigmas K x m matrix
-	 * @param pointsPerCluster number of points per cluster
-	 * @param seed for the RNG
-	 * @param randomize should the order of the instances be randomized?
-	 * @param supervised should class label be present? if true, the class is the m+1 attribute
+	 * Generates a Gaussian data set with K clusters and m dimensions
+	 * 
+	 * @param centers
+	 *            K x m matrix
+	 * @param sigmas
+	 *            K x m matrix
+	 * @param pointsPerCluster
+	 *            number of points per cluster
+	 * @param seed
+	 *            for the RNG
+	 * @param randomize
+	 *            should the order of the instances be randomized?
+	 * @param supervised
+	 *            should class label be present? if true, the class is the m+1
+	 *            attribute
 	 * 
 	 * @return
 	 */
-	public static Instances genGaussianDataset(double[][] centers, double[][] sigmas, int pointsPerCluster, long seed, boolean randomize, boolean supervised) {
+	public static Instances genGaussianDataset(double[][] centers,
+			double[][] sigmas, int pointsPerCluster, long seed,
+			boolean randomize, boolean supervised) {
 		Random r = new Random(seed);
-		
+
 		int K = centers.length; // number of clusters
 		int m = centers[0].length; // number of dimensions
-		
+
 		FastVector atts = new FastVector(m);
-		for(int i = 0; i < m; i++)
+		for (int i = 0; i < m; i++)
 			atts.addElement(new Attribute("at" + i));
-		
-		if(supervised) {
+
+		if (supervised) {
 			FastVector cls = new FastVector(K);
-			for(int i = 0; i < K; i++) cls.addElement("Gauss-" + i);
+			for (int i = 0; i < K; i++)
+				cls.addElement("Gauss-" + i);
 			atts.addElement(new Attribute("Class", cls));
 		}
-		
+
 		Instances data;
 		if (supervised)
-			data = new Instances(K + "-Gaussians-supervised", atts, K * pointsPerCluster);
+			data = new Instances(K + "-Gaussians-supervised", atts, K
+					* pointsPerCluster);
 		else
 			data = new Instances(K + "-Gaussians", atts, K * pointsPerCluster);
-		
-		if(supervised)
+
+		if (supervised)
 			data.setClassIndex(m);
-			
+
 		Instance ith;
-		
-		for(int i = 0; i < K ; i++) {
-			for(int j = 0; j < pointsPerCluster; j++) {
-				if(!supervised)
+
+		for (int i = 0; i < K; i++) {
+			for (int j = 0; j < pointsPerCluster; j++) {
+				if (!supervised)
 					ith = new Instance(m);
 				else
-					ith = new Instance(m+1);
+					ith = new Instance(m + 1);
 				ith.setDataset(data);
-				for(int k = 0; k < m; k++) 
-					ith.setValue(k, centers[i][k] + (r.nextGaussian() * sigmas[i][k]));
+				for (int k = 0; k < m; k++)
+					ith.setValue(k, centers[i][k]
+							+ (r.nextGaussian() * sigmas[i][k]));
 				if (supervised)
 					ith.setValue(m, "Gauss-" + i);
 				data.add(ith);
 			}
 		}
-		
+
 		// run randomization filter if desired
-		if(randomize)
+		if (randomize)
 			data.randomize(r);
-		
+
 		return data;
 	}
-	
+
 	/**
-	 * Generates an integer sequence of the form (start, start+1, ..., start + nsteps - 1)
+	 * Generates an integer sequence of the form (start, start+1, ..., start +
+	 * nsteps - 1)
+	 * 
 	 * @param start
 	 * @param nsteps
 	 * @return
@@ -101,71 +150,78 @@ public class MyUtils {
 	public static int[] genIntSeries(int start, int nsteps) {
 		int[] series = new int[nsteps];
 		series[0] = start;
-		for(int i = 1; i < nsteps; i++)
+		for (int i = 1; i < nsteps; i++)
 			series[i] = series[i - 1] + 1;
 		return series;
 	}
-	
+
 	/**
 	 * Generate an exponential series of the form: (base^1, ..., base^nsteps)
+	 * 
 	 * @param base
 	 * @param nsteps
 	 * @return
 	 */
 	public static double[] genExpSeries(double base, int nsteps) {
 		double[] series = new double[nsteps];
-		for(int i = 0; i < nsteps; i++)
-			series[i] = Math.pow(base, i+1);
+		for (int i = 0; i < nsteps; i++)
+			series[i] = Math.pow(base, i + 1);
 		return series;
 	}
-	
+
 	/**
 	 * Creates a linearly spaced double array with n elements.
-	 * @param start first element
-	 * @param end last element
-	 * @param n number of elements
+	 * 
+	 * @param start
+	 *            first element
+	 * @param end
+	 *            last element
+	 * @param n
+	 *            number of elements
 	 * @return linearly spaced array
 	 */
 	public static double[] linspace(double start, double end, int n) {
 		double[] ar = new double[n];
 		double step = (end - start) / (n - 1);
-		
-		if(n < 3) {
+
+		if (n < 3) {
 			throw new RuntimeException("n must be >= 3");
 		}
-		
+
 		ar[0] = start;
 		ar[n - 1] = end;
-		
-		for(int i = 1; i < n - 1; i++)
+
+		for (int i = 1; i < n - 1; i++)
 			ar[i] = ar[i - 1] + step;
-		
+
 		return ar;
 	}
-	
+
 	/**
 	 * Find the minimum value in the column of a matrix
+	 * 
 	 * @param mat
 	 * @param col
 	 * @return
 	 */
 	public static double getMinInCol(double[][] mat, int col) {
 		double min = Double.MAX_VALUE;
-		for(int i = 0; i < mat.length; i++)
+		for (int i = 0; i < mat.length; i++)
 			if (mat[i][col] < min)
 				min = mat[i][col];
 		return min;
 	}
-	
+
 	/**
 	 * Find the maximum value in the column of a matrix
+	 * 
 	 * @param mat
 	 * @param col
 	 * @return
 	 */
 	public static double getMaxInCol(double[][] mat, int col) {
 		double max = Double.MIN_VALUE;
-		for(int i = 0; i < mat.length; i++)
+		for (int i = 0; i < mat.length; i++)
 			if (mat[i][col] > max)
 				max = mat[i][col];
 		return max;
@@ -277,7 +333,7 @@ public class MyUtils {
 		}
 		return idx;
 	}
-	
+
 	public static void print_matrix(int[][] matrix) {
 		int nrows, ncols;
 		ncols = matrix[0].length;
@@ -310,7 +366,7 @@ public class MyUtils {
 		}
 		return unique;
 	}
-	
+
 	public static int getMin(int[] vec) {
 		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < vec.length; i++)
