@@ -27,6 +27,42 @@ import weka.filters.unsupervised.attribute.Remove;
  */
 public class MyUtils {
 	
+	public static String arrayToString(int[] ar) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for(int i = 0; i < ar.length; i++) {
+			sb.append(ar[i]);
+			if(i + 1 < ar.length)
+				sb.append(", ");
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+	
+	public static String arrayToString(double[] ar) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for(int i = 0; i < ar.length; i++) {
+			sb.append(ar[i]);
+			if(i + 1 < ar.length)
+				sb.append(", ");
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+	
+	public static String arrayToString(boolean[] ar) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for(int i = 0; i < ar.length; i++) {
+			sb.append(ar[i]);
+			if(i + 1 < ar.length)
+				sb.append(", ");
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+	
 	public static void print_dataset_as_matrix(Instances data) {
 		for(int i = 0; i < data.numInstances(); i++) {
 			for(int j = 0; j < data.numAttributes(); j++)
@@ -563,17 +599,17 @@ public class MyUtils {
 	}
 
 	public static void print_array(FastVector array) {
-		System.out.print("[ ");
-		for (int i = 0; i < array.size(); i++)
-			System.out.print(array.elementAt(i) + ", ");
+		System.out.print("[");
+		for (int i = 0; i < array.size(); i++) {
+			System.out.print(array.elementAt(i));
+			if(i + 1 < array.size())
+				System.out.print(", ");
+		}
 		System.out.println("]");
 	}
 
 	public static void print_array(double[] array) {
-		System.out.print("[ ");
-		for (int i = 0; i < array.length; i++)
-			System.out.print(array[i] + ", ");
-		System.out.println("]");
+		System.out.println(arrayToString(array));
 	}
 
 	public static void print_matrix(double[][] matrix) {
@@ -658,10 +694,7 @@ public class MyUtils {
 	}
 
 	public static void print_array(int[] array) {
-		System.out.print("[ ");
-		for (int i = 0; i < array.length; i++)
-			System.out.print(array[i] + ", ");
-		System.out.println("]");
+		System.out.println(arrayToString(array));
 	}
 
 }
