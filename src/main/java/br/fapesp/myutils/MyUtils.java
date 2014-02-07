@@ -607,6 +607,10 @@ public class MyUtils {
 		}
 		System.out.println("]");
 	}
+	
+	public static void print_array(boolean[] array) {
+		System.out.println(arrayToString(array));
+	}
 
 	public static void print_array(double[] array) {
 		System.out.println(arrayToString(array));
