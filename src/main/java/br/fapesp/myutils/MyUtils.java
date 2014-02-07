@@ -4,13 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.MathArrays;
 
 import weka.core.Attribute;
@@ -28,6 +27,135 @@ import weka.filters.unsupervised.attribute.Remove;
  */
 public class MyUtils {
 	
+	public static void print_dataset_as_matrix(Instances data) {
+		for(int i = 0; i < data.numInstances(); i++) {
+			for(int j = 0; j < data.numAttributes(); j++)
+				System.out.print(data.instance(i).value(j) + " ");
+			System.out.println();
+		}
+	}
+	
+	public static ArrayList<Integer> toArrayList(int[] values) {
+		ArrayList<Integer> ar = new ArrayList<Integer>();
+		for(int i = 0; i < values.length; i++) ar.add(values[i]);
+		return ar;
+	}
+	
+	public static ArrayList<Double> toArrayList(double[] values) {
+		ArrayList<Double> ar = new ArrayList<Double>();
+		for(int i = 0; i < values.length; i++) ar.add(values[i]);
+		return ar;
+	}
+	
+	/**
+	 * Selecting a value from values array at random using the weights provided
+	 * @param values
+	 * @param weights MUST sum to 1.0
+	 * @param rng
+	 * @param seed
+	 * @return
+	 */
+	public static int weightedValueRandomSelection(ArrayList<Integer> values, double[] weights, Random rng, long seed) {
+		if(Math.abs(MyUtils.sum(weights) - 1.0) > 0.01)
+			throw new RuntimeException("weights must sum to 1.0!");
+		if(values.size() != weights.length)
+			throw new RuntimeException("values and weights must be of the same size!");
+		
+		Random r;
+		
+		if(rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		
+		double[] _weights = new double[weights.length];
+		int[] sortidx = new int[weights.length];
+		double flip;
+		
+		System.arraycopy(weights, 0, _weights, 0, weights.length);
+		
+		Arrays.sort(_weights);
+		
+		ArrayList<Integer> _values = new ArrayList<Integer>();
+		
+		// find out the indexes of the correct sorting:
+		for(int i = 0; i < weights.length; i++) {
+			for(int j = 0; j < weights.length; j++)
+				if(_weights[i] == weights[j]) {
+					sortidx[i] = j;
+					break;
+				}
+		}
+		
+		// add the values in the sort order:
+		for(int i = 0; i < weights.length; i++)
+			_values.add(values.get(sortidx[i]));
+		
+		flip = r.nextDouble();
+		
+		// now check from the largest probability to the lowest, which one was selected:
+		double cumsum = 0;
+		
+		for(int i = weights.length - 1; i >= 0; i--) {
+			cumsum += _weights[i];
+			if (flip <= cumsum)
+				return _values.get(i);
+		}
+		
+		throw new RuntimeException("error occurred");
+	}
+	
+	/** 
+	 * Flip a coin using provided weights.
+	 * @param probTrue the probability the event is true 
+	 * @param rng
+	 * @param seed
+	 * @return
+	 */
+	public static boolean weightedCoinFlip(double probTrue, Random rng, long seed) {
+		Random r;
+		double flip;
+		if (rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		flip = r.nextDouble();
+		if (flip <= probTrue)
+			return true;
+		else
+			return false;
+	}
+	
+	public static int[] createArrayFromHashSet(HashSet<Integer> hash) {
+		int[] ar = new int[hash.size()];
+		int i = 0;
+		for(Integer val : hash) {
+			ar[i++] = val;
+		}
+		return ar;
+	}
+	
+	public static HashSet<Integer> createHashSetFromArray(int[] array) {
+		HashSet<Integer> hash = new HashSet<Integer>();
+		for(int i = 0; i < array.length; i++) hash.add(array[i]);
+		return hash;
+	}
+	
+	public static double[] uniformlySample(double low, double high, int nsamples, Random rng, long seed) {
+		double[] samples = new double[nsamples];
+		Random r;
+		
+		if (rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		
+		for(int i = 0; i < nsamples; i++)
+			samples[i] = r.nextDouble() * (high - low) + low;
+		
+		return samples;
+	}
+	
 	/**
 	 * Create an array of val repeated n times
 	 * @param val
@@ -39,6 +167,18 @@ public class MyUtils {
 		for(int i = 0; i < n; i++)
 			x[i] = val;
 		return x;
+	}
+	
+	/**
+	 * Compute the sum of the array x
+	 * @param x
+	 * @return
+	 */
+	public static double sum(double[] x) {
+		double sum = 0;
+		for(int i = 0; i < x.length; i++)
+			sum += x[i];
+		return sum;
 	}
 	
 	/**
@@ -64,13 +204,19 @@ public class MyUtils {
 	public static double[] sampleWithoutReplacement(double[] values, int nsamples, Random rng, long seed) {
 		if (nsamples > values.length)
 			throw new RuntimeException("Requested sampling of more values than are available in array!");
+		Random r;
+		if (rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		
 		double[] samples = new double[nsamples];
 		ArrayList<Double> al = new ArrayList<Double>();
 		
 		for(int i = 0; i < values.length; i++) al.add(values[i]);
 		
 		for(int i = 0; i < nsamples; i++) 
-			samples[i] = al.remove(rng.nextInt(al.size()));
+			samples[i] = al.remove(r.nextInt(al.size()));
 		
 		return samples;
 	}
@@ -86,13 +232,19 @@ public class MyUtils {
 	public static int[] sampleWithoutReplacement(int[] values, int nsamples, Random rng, long seed) {
 		if (nsamples > values.length)
 			throw new RuntimeException("Requested sampling of more values than are available in array!");
+		Random r;
+		if (rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		
 		int[] samples = new int[nsamples];
 		ArrayList<Integer> al = new ArrayList<Integer>();
 		
 		for(int i = 0; i < values.length; i++) al.add(values[i]);
 		
 		for(int i = 0; i < nsamples; i++) 
-			samples[i] = al.remove(rng.nextInt(al.size()));
+			samples[i] = al.remove(r.nextInt(al.size()));
 		
 		return samples;
 	}

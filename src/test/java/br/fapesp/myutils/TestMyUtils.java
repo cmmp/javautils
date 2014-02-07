@@ -1,12 +1,28 @@
 package br.fapesp.myutils;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import weka.core.Instances;
 
 public class TestMyUtils {
+	
+	@Ignore
+	@Test
+	public void testWeightedSampling() {
+		ArrayList<Integer> values = new ArrayList<Integer>();
+		values.add(1); values.add(2); values.add(3); values.add(4); values.add(5);
+		double[] weights = new double[] {0.1, 0.45, 0.03, 0.3, 0.12}; // correct sort idx: 2, 0, 4, 3, 1
+		// plot a histogram of the following results to check probs are ok:
+		for(int i = 0; i < 1000; i++)
+			System.out.println(MyUtils.weightedValueRandomSelection(values, weights, null, System.nanoTime()));
+		
+	}
 	
 	@Test
 	public void testGenGaussian() {
