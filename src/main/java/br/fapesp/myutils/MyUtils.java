@@ -43,6 +43,48 @@ import weka.filters.unsupervised.attribute.Remove;
  */
 public class MyUtils {
 	
+	/**
+	 * Compute the Minimum Spanning Tree (MST) using Prim's algorithm - O(n^2).
+	 * 
+	 * @param data points in R^n
+	 * @return a 2-d array listing the edges of the MST.
+	 */
+	public static int[][] computeMinimumSpanningTreePrim(double[][] data) {	
+		int N = data.length;		
+		int[][] mst = new int[N-1][2];
+		double[][] D = getEuclideanMatrix(data); // euclidean dissimilarity matrix
+		double minw;
+		int ichosen = -1, v_to_add = -1;
+		int k = 0;
+		
+		HashSet<Integer> vin = new HashSet<Integer>();
+		HashSet<Integer> vout = new HashSet<Integer>();
+		
+		for(int i = 1; i < N; i++) 
+			vout.add(i); // put all vertices on the out set, except the first
+		
+		vin.add(0); // add the first vertex
+		
+		while (vout.size() > 0) {
+			// find the edge with minimum weight to add:
+			minw = Double.MAX_VALUE;
+			for(int i : vin )
+				for(int j : vout) {
+					if(D[i][j] < minw) {
+						ichosen = i;
+						minw = D[i][j];
+						v_to_add = j;
+					}
+				}
+			vout.remove(v_to_add);
+			vin.add(v_to_add);
+			mst[k][0] = ichosen; mst[k][1] = v_to_add;
+			k++;
+		}
+		
+		return mst;
+	}
+	
 	public static String arrayToString(int[] ar) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
@@ -586,6 +628,48 @@ public class MyUtils {
 		frame.setSize(width, height);
 		frame.setVisible(true);
 	}
+	
+	/**
+	 * Compute the Euclidean dissimilarity matrix on data
+	 * 
+	 * @param N data points in R^n
+	 * @return an NxN matrix containing the Euclidean distance among points.
+	 */
+	public static double[][] getEuclideanMatrix(double[][] data) {
+		int N = data.length;
+		double[][] dist = new double[N][N];
+		double d;
+
+		for (int i = 0; i < N - 1; i++) {
+			for (int j = i + 1; j < N; j++) {
+				d = MathArrays.distance(data[i], data[j]);
+				dist[i][j] = d;
+				dist[j][i] = d;
+			}
+		}
+
+		return (dist);
+	}
+	
+	/**
+	 * Convert an Instances data set to a doubles matrix.
+	 * @param data
+	 * @return data as a double array
+	 */
+	public static double[][] convertInstancesToDoubleMatrix(Instances data) {
+		int N = data.numInstances();
+		int m = data.numAttributes();
+		double[][] ddata = new double[N][m];
+		double[] temp;
+		
+		for (int i = 0; i < N; i++) {
+			temp = data.instance(i).toDoubleArray();
+			for (int j = 0; j < m; j++)
+				ddata[i][j] = temp[j];
+		}
+		
+		return(ddata);
+	}
 
 	/**
 	 * Compute the Euclidean dissimilarity matrix on data
@@ -594,24 +678,7 @@ public class MyUtils {
 	 * @return
 	 */
 	public static double[][] getEuclideanMatrix(Instances data) {
-		int N = data.numInstances();
-		double[][] dist = new double[N][N];
-		double d;
-		// EuclideanDistance euc = new EuclideanDistance(data); // distance
-		// calculator from weka
-		// euc.setDontNormalize(true);
-
-		for (int i = 0; i < N - 1; i++) {
-			for (int j = i + 1; j < N; j++) {
-				// d = euc.distance(data.instance(i), data.instance(j));
-				d = MathArrays.distance(data.instance(i).toDoubleArray(), data
-						.instance(j).toDoubleArray());
-				dist[i][j] = d;
-				dist[j][i] = d;
-			}
-		}
-
-		return (dist);
+		return (getEuclideanMatrix(convertInstancesToDoubleMatrix(data)));
 	}
 
 	public static void print_array(FastVector array) {
