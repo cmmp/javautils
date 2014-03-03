@@ -44,6 +44,35 @@ import weka.filters.unsupervised.attribute.Remove;
 public class MyUtils {
 	
 	/**
+	 * A faster version of Prim's algorithm using a priority queue to 
+	 * compute the Minimum Spanning Tree (MST).
+	 * 
+	 * @param data points in R^n
+	 * @return a 2-d array listing the edges of the MST.
+	 */
+	public static int[][] fastPrim(double[][] data) {	
+		int N = data.length;		
+		int[][] mst = new int[N-1][2];
+		double[][] D = getEuclideanMatrix(data); // euclidean dissimilarity matrix
+		HeapKey[] keys = new HeapKey[N-1];
+		
+		for (int i = 1; i < N; i++)
+			keys[i - 1] = new EdgeElement(i, 0, D[0][i]);
+		
+		MinHeap mh = new MinHeap(keys);
+		mh.build();
+		
+		for (int i = 0; i < N - 1; i++) {
+			EdgeElement e = (EdgeElement) mh.getMinFast();
+			mst[i][0] = e.v;
+			mst[i][1] = e.u;
+			mh.updateKeys(e.u, D);
+		}
+			
+		return mst;
+	}
+	
+	/**
 	 * Compute the Minimum Spanning Tree (MST) using Prim's algorithm - O(n^2).
 	 * 
 	 * @param data points in R^n

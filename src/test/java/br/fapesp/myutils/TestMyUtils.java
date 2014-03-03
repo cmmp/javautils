@@ -29,6 +29,18 @@ import weka.core.Instances;
 public class TestMyUtils {
 	
 	@Test
+	public void testFastPrim() {
+		double[][] data = new double[][] { {1., 2}, {3, 4}, {0, -1}, {3,6}, {7,8}, {9,10}, {-2,3}};
+		int[][] mst = MyUtils.fastPrim(data);
+		int[][] expected = new int[][] {{0,1}, {1,3}, {0,2}, {0,6}, {3,4}, {4,5}};
+		for(int i = 0 ; i < expected.length; i++) {
+			//System.out.printf("Expected: [%d][%d] got: [%d][%d]\n", expected[i][0], expected[i][1], mst[i][0], mst[i][1]);
+			for(int j = 0; j < 2; j++)
+				assertEquals(expected[i][j], mst[i][j]);
+		}
+	}
+	
+	@Test
 	public void testMinimumSpanningTreePrim() {
 		double[][] data = new double[][] { {1., 2}, {3, 4}, {0, -1}, {3,6}, {7,8}, {9,10}, {-2,3}};
 		int[][] mst = MyUtils.computeMinimumSpanningTreePrim(data);
