@@ -18,9 +18,13 @@ package br.fapesp.myutils;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.JComponent;
@@ -28,6 +32,7 @@ import javax.swing.JFrame;
 
 import org.apache.commons.math3.util.MathArrays;
 
+import au.com.bytecode.opencsv.CSVReader;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
@@ -42,6 +47,50 @@ import weka.filters.unsupervised.attribute.Remove;
  * 
  */
 public class MyUtils {
+	
+	/**
+	 * Read a CSV file to a double's matrix.
+	 * 
+	 * @param filePath path to the csv file
+	 * @param hasHeader whether the first line is a header
+	 * @param separator the character separating each element in a line
+	 * @return a double's matrix representation of the data set
+	 */
+	public static double[][] readCSVdataSet(String filePath, boolean hasHeader, char separator) {
+		double[][] data = null;
+		int N, m;
+		
+		try {
+			CSVReader reader = new CSVReader(new FileReader(filePath), separator);
+			System.out.println("-----------***-----");
+			List<String[]> lines = reader.readAll();
+			
+			if (hasHeader)
+				lines.remove(0);
+			
+			N = lines.size();
+			m = lines.get(0).length;
+					
+			data = new double[N][m];
+			
+			MyUtils.print_array(lines.get(0));
+			
+			for (int i = 0; i < N; i++) 
+				for (int j = 0; j < m; j++)
+					data[i][j] = Double.parseDouble(lines.get(i)[j]);
+			
+			lines = null;
+			
+			reader.close();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return data;
+	}
 	
 	/**
 	 * Rescale data to be in the range newMin:newMax
@@ -174,6 +223,18 @@ public class MyUtils {
 	}
 	
 	public static String arrayToString(double[] ar) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		for(int i = 0; i < ar.length; i++) {
+			sb.append(ar[i]);
+			if(i + 1 < ar.length)
+				sb.append(", ");
+		}
+		sb.append("]");
+		return sb.toString();
+	}
+	
+	public static String arrayToString(String[] ar) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
 		for(int i = 0; i < ar.length; i++) {
@@ -756,6 +817,10 @@ public class MyUtils {
 	public static double[][] getEuclideanMatrix(Instances data) {
 		return (getEuclideanMatrix(convertInstancesToDoubleMatrix(data)));
 	}
+	
+	public static void print_array(String[] array) {
+		System.out.println(arrayToString(array));
+	}
 
 	public static void print_array(FastVector array) {
 		System.out.print("[");
@@ -781,8 +846,11 @@ public class MyUtils {
 		nrows = matrix.length;
 
 		for (int i = 0; i < nrows; i++) {
-			for (int j = 0; j < ncols; j++)
-				System.out.print(matrix[i][j] + " ");
+			for (int j = 0; j < ncols; j++) {
+				System.out.print(matrix[i][j]);
+				if(j + 1 < ncols)
+					System.out.print(" ");
+			}
 			System.out.print("\n");
 		}
 
@@ -813,8 +881,11 @@ public class MyUtils {
 		nrows = matrix.length;
 
 		for (int i = 0; i < nrows; i++) {
-			for (int j = 0; j < ncols; j++)
-				System.out.print(matrix[i][j] + " ");
+			for (int j = 0; j < ncols; j++) {
+				System.out.print(matrix[i][j]);
+				if(j + 1 < ncols)
+					System.out.print(" ");
+			}
 			System.out.print("\n");
 		}
 	}
