@@ -18,8 +18,6 @@ package br.fapesp.myutils;
 
 import java.util.ArrayList;
 
-import br.fapesp.myutils.MyUtils;
-
 /**
  * MinHeap code based on the book "Projeto de algoritmos
  * com implementações em Java e C++. Nivio Ziviani".
