@@ -62,7 +62,7 @@ public class MyUtils {
 		
 		try {
 			CSVReader reader = new CSVReader(new FileReader(filePath), separator);
-			System.out.println("-----------***-----");
+			
 			List<String[]> lines = reader.readAll();
 			
 			if (hasHeader)
@@ -72,8 +72,6 @@ public class MyUtils {
 			m = lines.get(0).length;
 					
 			data = new double[N][m];
-			
-			MyUtils.print_array(lines.get(0));
 			
 			for (int i = 0; i < N; i++) 
 				for (int j = 0; j < m; j++)
