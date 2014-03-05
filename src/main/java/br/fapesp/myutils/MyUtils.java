@@ -44,6 +44,53 @@ import weka.filters.unsupervised.attribute.Remove;
 public class MyUtils {
 	
 	/**
+	 * Rescale data to be in the range newMin:newMax
+	 * @param data the data set
+	 * @param newMin new minimum value
+	 * @param newMax new maximum value
+	 * @return the rescaled data
+	 */
+	public static double[] rescaleToRange(double[] data, double newMin, double newMax) {
+		double[] rescaled = new double[data.length];
+		double oldMin = getMin(data);
+		double oldMax = getMax(data);
+		
+		for (int i = 0; i < data.length; i++)
+			rescaled[i] = (((data[i] - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+		
+		return rescaled;
+	}
+	
+	/**
+	 * A faster version of Prim's algorithm using a priority queue to 
+	 * compute the Minimum Spanning Tree (MST).
+	 * 
+	 * @param data points in R^n
+	 * @param D euclidean distance matrix already computed
+	 * @return a 2-d array listing the edges of the MST.
+	 */
+	public static int[][] fastPrim(double[][] data, double[][] D) {	
+		int N = data.length;		
+		int[][] mst = new int[N-1][2];
+		HeapKey[] keys = new HeapKey[N-1];
+		
+		for (int i = 1; i < N; i++)
+			keys[i - 1] = new EdgeElement(i, 0, D[0][i]);
+		
+		MinHeap mh = new MinHeap(keys);
+		mh.build();
+		
+		for (int i = 0; i < N - 1; i++) {
+			EdgeElement e = (EdgeElement) mh.getMinFast();
+			mst[i][0] = e.v;
+			mst[i][1] = e.u;
+			mh.updateKeys(e.u, D);
+		}
+			
+		return mst;
+	}
+	
+	/**
 	 * A faster version of Prim's algorithm using a priority queue to 
 	 * compute the Minimum Spanning Tree (MST).
 	 * 
@@ -803,6 +850,22 @@ public class MyUtils {
 
 	public static int getMax(int[] vec) {
 		int max = Integer.MIN_VALUE;
+		for (int i = 0; i < vec.length; i++)
+			if (vec[i] > max)
+				max = vec[i];
+		return max;
+	}
+	
+	public static double getMin(double[] vec) {
+		double min = Double.MAX_VALUE;
+		for (int i = 0; i < vec.length; i++)
+			if (vec[i] < min)
+				min = vec[i];
+		return min;
+	}
+
+	public static double getMax(double[] vec) {
+		double max = Double.MIN_VALUE;
 		for (int i = 0; i < vec.length; i++)
 			if (vec[i] > max)
 				max = vec[i];
