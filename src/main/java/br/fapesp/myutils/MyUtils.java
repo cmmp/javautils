@@ -23,6 +23,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -32,13 +33,13 @@ import javax.swing.JFrame;
 
 import org.apache.commons.math3.util.MathArrays;
 
-import au.com.bytecode.opencsv.CSVReader;
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Utility class with many auxiliary methods.
@@ -47,6 +48,35 @@ import weka.filters.unsupervised.attribute.Remove;
  * 
  */
 public class MyUtils {
+	
+	/**
+	 * Print a character n times on stdout
+	 * @param c character
+	 * @param ntimes number of times to print
+	 */
+	public static void printRep(char c, int ntimes) {
+		StringBuffer sb = new StringBuffer(c);
+		for (int i = 0; i < ntimes - 1; i++)
+			sb.append(c);
+		System.out.println(sb);
+	}
+	
+	/**
+	 * Print the current system timestamp to stdout
+	 */
+	public static void printTimestamp() {
+		System.out.println(getCurrentTimestamp());
+	}
+	
+	
+	/**
+	 * Get current timestamp of the system
+	 * @return timestamp with the format: dow mon dd hh:mm:ss zzz yyyy
+	 */
+	public static String getCurrentTimestamp() {
+		Date d = new Date();
+		return d.toString();
+	}
 	
 	/**
 	 * Read a CSV file to a double's matrix.
