@@ -34,6 +34,7 @@ import javax.swing.JFrame;
 import org.apache.commons.math3.util.MathArrays;
 
 import weka.core.Attribute;
+import weka.core.DenseInstance;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -635,9 +636,9 @@ public class MyUtils {
 		for (int i = 0; i < K; i++) {
 			for (int j = 0; j < pointsPerCluster; j++) {
 				if (!supervised)
-					ith = new Instance(m);
+					ith = new DenseInstance(m);
 				else
-					ith = new Instance(m + 1);
+					ith = new DenseInstance(m + 1);
 				ith.setDataset(data);
 				for (int k = 0; k < m; k++)
 					ith.setValue(k, centers[i][k]
