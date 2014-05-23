@@ -1,0 +1,9 @@
+target/*
+.classpath
+.project
+.settings/*
+.DS_Store
+syntax: glob
+*.arff
+*.dat
+*.pdf
