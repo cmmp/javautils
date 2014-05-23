@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -49,6 +50,61 @@ import au.com.bytecode.opencsv.CSVReader;
  * 
  */
 public class MyUtils {
+	
+	/**
+	 * Compute the squared euclidean distance between two doubles arrays
+	 * @param x
+	 * @param y
+	 * @return the *squared* euclidean distance
+	 */
+	public static double squaredEuclideanDistance(double[] x, double[] y) {
+		double dist = 0;
+		double diff;
+		
+		for (int i = 0; i < x.length; i++) {
+			diff = x[i] - y[i];
+			dist += diff * diff;
+		}
+		
+		return dist;
+	}
+	
+	/**
+	 * Convert a list to an array
+	 * @param list
+	 * @return
+	 */
+	public static double[] listToArray(List<Double> list) {
+		double[] array = new double[list.size()];
+		for (int i = 0; i < list.size(); i++)
+			array[i] = list.get(i);
+		return array;
+	}
+	
+	/**
+	 * Get the most frequently occurring number in a sequence
+	 * @param values the sequence of numbers
+	 * @return the number that appears the most times in the sequence
+	 */
+	public static double getMostFrequenceOccurrence(double[] values) {
+		HashMap<Double, Integer> mapCount = new HashMap<Double, Integer>();
+		int mostFreq = -1;
+		double mostFreqVal = -1;
+		
+		for (int i = 0; i < values.length; i++) {
+			if (!mapCount.containsKey(values[i]))
+				mapCount.put(values[i], 0);
+			else
+				mapCount.put(values[i], mapCount.get(values[i]) + 1);
+		}
+		for (Double key : mapCount.keySet()) {
+			if (mapCount.get(key) > mostFreq) {
+				mostFreq = mapCount.get(key);
+				mostFreqVal = key;
+			}
+		}
+		return mostFreqVal;
+	}
 	
 	/**
 	 * Print a character n times on stdout
@@ -183,6 +239,7 @@ public class MyUtils {
 	/**
 	 * Compute the Minimum Spanning Tree (MST) using Prim's algorithm - O(n^2).
 	 * 
+	 * @deprecated
 	 * @param data points in R^n
 	 * @return a 2-d array listing the edges of the MST.
 	 */
@@ -685,6 +742,30 @@ public class MyUtils {
 			series[i] = Math.pow(base, i + 1);
 		return series;
 	}
+	
+	/**
+	 * Creates an exponentially increasing sequence
+	 * @param start
+	 * @param end
+	 * @param n number of elements
+	 * @return An n-element sequence of exponentially increasing elements
+	 */
+	public static double[] expspace(double start, double end, int n) {
+		double[] ar = new double[n];
+		double step = (Math.log10(end) - Math.log10(start)) / (n - 1);
+
+		if (n < 3) {
+			throw new RuntimeException("n must be >= 3");
+		}
+
+		ar[0] = start;
+		ar[n - 1] = end;
+
+		for (int i = 1; i < n - 1; i++)
+			ar[i] = Math.exp(Math.log(10) * (Math.log10(ar[i - 1]) + step));
+
+		return ar;
+	}
 
 	/**
 	 * Creates a linearly spaced double array with n elements.
@@ -913,6 +994,48 @@ public class MyUtils {
 			System.out.print("\n");
 		}
 	}
+	
+	/**
+	 * Get the unique elements in a sequence of values
+	 * @param values a sequence of numbers
+	 * @return a hashset containing each unique occurence
+	 */
+	public static HashSet<String> getUniqueElements(String[] values) {
+		HashSet<String> unique = new HashSet<String>();
+		
+		for (int i = 0; i < values.length; i++) 
+			unique.add(values[i]);
+		
+		return unique;
+	}
+	
+	/**
+	 * Get the unique elements in a sequence of values
+	 * @param values a sequence of numbers
+	 * @return a hashset containing each unique occurence
+	 */
+	public static HashSet<Integer> getUniqueElements(int[] values) {
+		HashSet<Integer> unique = new HashSet<Integer>();
+		
+		for (int i = 0; i < values.length; i++) 
+			unique.add(values[i]);
+		
+		return unique;
+	}
+	
+	/**
+	 * Get the unique elements in a sequence of values
+	 * @param values a sequence of numbers
+	 * @return a hashset containing each unique occurence
+	 */
+	public static HashSet<Double> getUniqueElements(double[] values) {
+		HashSet<Double> unique = new HashSet<Double>();
+		
+		for (int i = 0; i < values.length; i++) 
+			unique.add(values[i]);
+		
+		return unique;
+	}
 
 	public static FastVector getUniqueElements(FastVector fv) {
 		FastVector unique = new FastVector(fv.size());
@@ -921,6 +1044,24 @@ public class MyUtils {
 				unique.addElement(fv.elementAt(i));
 		}
 		return unique;
+	}
+	
+	public static double getMatrixMax(double[][] matrix) {
+		double max = matrix[0][0];
+		for(int i = 0; i < matrix.length; i++)
+			for(int j = 0; j < matrix[0].length; j++)
+				if (matrix[i][j] > max)
+					max = matrix[i][j];
+		return max;
+	}
+	
+	public static double getMatrixMin(double[][] matrix) {
+		double min = matrix[0][0];
+		for(int i = 0; i < matrix.length; i++)
+			for(int j = 0; j < matrix[0].length; j++)
+				if (matrix[i][j] < min)
+					min = matrix[i][j];
+		return min;
 	}
 
 	public static int getMin(int[] vec) {
