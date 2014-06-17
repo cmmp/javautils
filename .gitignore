@@ -6,3 +6,4 @@ target/*
 *.arff
 *.dat
 *.pdf
+*.iml
