@@ -50,6 +50,22 @@ import au.com.bytecode.opencsv.CSVReader;
  * 
  */
 public class MyUtils {
+
+    public static int argMax(ArrayList<Double> array) {
+        int argmax = 0;
+        double max = array.get(0);
+        double v;
+
+        for (int i = 1; i < array.size(); i++) {
+            v = array.get(i);
+            if (v > max) {
+                max = v;
+                argmax = i;
+            }
+        }
+
+        return argmax;
+    }
 	
 	/**
 	 * Compute the squared euclidean distance between two doubles arrays
@@ -68,8 +84,20 @@ public class MyUtils {
 		
 		return dist;
 	}
-	
-	/**
+
+    /**
+     * Convert a list to an array
+     * @param list
+     * @return
+     */
+    public static int[] listToArrayInt(List<Integer> list) {
+        int[] array = new int[list.size()];
+        for (int i = 0; i < list.size(); i++)
+            array[i] = list.get(i);
+        return array;
+    }
+
+    /**
 	 * Convert a list to an array
 	 * @param list
 	 * @return
