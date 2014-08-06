@@ -50,6 +50,47 @@ import au.com.bytecode.opencsv.CSVReader;
  * 
  */
 public class MyUtils {
+	
+	/**
+	 * Estimate the maximum distance among points without computing the full
+	 * Euclidean matrix. The method uses a subsample of the points to make
+	 * the estimation.
+	 * 
+	 * @param points original data matrix (NOT a distance matrix).
+	 * @param ratio the ratio as in (original number of points) / (ratio) to use as the number of samples
+	 * @param factor the estimation will use (max dist in subsample) * (factor) as the estimate - use 1.0 for the sample estimate.
+	 * @param rng random number generator object (may be null)
+	 * @param seed seed for the RNG if no rng was passed as a parameter
+	 * @return the estimate for the maximum distance
+	 */
+	public static double estimateMaxDist(double[][] points, int ratio, double factor, Random rng, long seed) {
+		
+		Random r;
+		
+		if (rng == null)
+			r = new Random(seed);
+		else
+			r = rng;
+		
+		int nsamples = points.length / ratio;
+		
+		if (nsamples <= 1) // we're probably dealing with a small matrix.
+			nsamples = points.length;
+		
+		int ndim = points[0].length;
+		
+		double[][] sampled = new double[nsamples][ndim];
+		
+		int[] available = MyUtils.genIntSeries(0, points.length);
+		int[] pos = MyUtils.sampleWithoutReplacement(available, nsamples, r, -1);
+		
+		for(int i = 0; i < nsamples; i++)
+			System.arraycopy(points[pos[i]], 0, sampled[i], 0, ndim);
+		
+		double[][] dist = MyUtils.getEuclideanMatrix(sampled);
+		
+		return MyUtils.getMatrixMax(dist) * factor;
+	}
 
     public static int argMax(ArrayList<Double> array) {
         int argmax = 0;
