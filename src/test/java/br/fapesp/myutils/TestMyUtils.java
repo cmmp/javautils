@@ -29,6 +29,16 @@ import weka.core.Instances;
 public class TestMyUtils {
 	
 	@Test
+	public void testHausdorff() {
+		double[][] x = { {0, 0}, {1,1} };
+		double[][] y = { {3.0, -0.5}, {0.2, -3.0}, {3.1, -5.0} };
+		
+		double h = MyUtils.hausdorff(x, y);
+		
+		assertEquals(5.883026, h, 1e-5);
+	}
+	
+	@Test
 	@Ignore
 	public void testEmbedd() {
 		

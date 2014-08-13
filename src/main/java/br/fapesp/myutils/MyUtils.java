@@ -51,6 +51,34 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class MyUtils {
 	
+	private static double internalHausdorffAlg(double[][] x, double[][] y) {
+		double h = 0;
+		double dij, shortest;
+		
+		for (int i = 0; i < x.length; i++) {
+			shortest = Double.MAX_VALUE;
+			for (int j = 0; j < y.length; j++) {
+				dij = squaredEuclideanDistance(x[i], y[j]);
+				if (dij < shortest)
+					shortest = dij;
+			}
+			if (shortest > h)
+				h = shortest;
+		}
+		return Math.sqrt(h);
+	}
+	
+	/**
+	 * Computes the Hausdorff distance between the points in x and y.
+	 * @see <a href="http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/98/normand/main.html">Hausdorff distance</a>
+	 * @param x first input matrix
+	 * @param y second input matrix
+	 * @return Hausdorff distance between x and y
+	 */
+	public static double hausdorff(double[][] x, double[][] y) {	
+		return Math.max(internalHausdorffAlg(x, y), internalHausdorffAlg(y, x));
+	}
+	
 	/**
 	 * Creates a sequence of elements from start to end (omited) with the step given.
 	 * @param start initial element
