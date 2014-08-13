@@ -52,6 +52,50 @@ import au.com.bytecode.opencsv.CSVReader;
 public class MyUtils {
 	
 	/**
+	 * Creates a sequence of elements from start to end (omited) with the step given.
+	 * @param start initial element
+	 * @param end end point (omitted!)
+	 * @param step step size between elements
+	 * @return the sequence
+	 */
+	public static int[] range(int start, int end, int step) {
+		if (end <= start) {
+			throw new RuntimeException("end must be greater than start!");
+		}
+		int n = (int) Math.ceil((end - start) / ((float) step));
+		int[] seq = new int[n];
+		
+		seq[0] = start;
+		
+		for(int i = 1; i < n; i++)
+			seq[i] = seq[i - 1] + step; 
+		
+		return seq;
+	}
+	
+	/**
+	 * Create the embedding of a series in phase space.
+	 * @param series the original time series
+	 * @param delay the separation dimension
+	 * @param embedding the embedding dimension
+	 * @return reconstructed series in phase space
+	 */
+	public static double[][] embedd(double[] series, int delay, int embedding) {
+		int n = series.length;
+		int m = n - (embedding - 1) * delay;
+		double[][] rec = new double[m][embedding];
+		int[] idxs;
+		
+		for (int i = 0; i < m; i++) {
+			idxs = MyUtils.range(i, i + embedding * delay, delay);
+			for (int j = 0; j < embedding; j++)
+				rec[i][j] = series[idxs[j]];
+		}
+		
+		return rec;
+	}
+
+	/**
 	 * Estimate the maximum distance among points without computing the full
 	 * Euclidean matrix. The method uses a subsample of the points to make
 	 * the estimation.

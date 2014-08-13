@@ -29,6 +29,49 @@ import weka.core.Instances;
 public class TestMyUtils {
 	
 	@Test
+	@Ignore
+	public void testEmbedd() {
+		
+		// R output for comparison:
+//		> require(tseriesChaos)
+//		Loading required package: tseriesChaos
+//		Loading required package: deSolve
+//		> x = c(1,5,10,20,-2,-3,4,8,10,15,23,25,40)
+//		> x
+//		 [1]  1  5 10 20 -2 -3  4  8 10 15 23 25 40
+//		> length(x)
+//		[1] 13
+//		> embedd(x,
+//		d=     lags=  m=     x=
+//		> embedd(x, m = 3, d = 2)
+//		      V1/0 V1/2 V1/4
+//		 [1,]    1   10   -2
+//		 [2,]    5   20   -3
+//		 [3,]   10   -2    4
+//		 [4,]   20   -3    8
+//		 [5,]   -2    4   10
+//		 [6,]   -3    8   15
+//		 [7,]    4   10   23
+//		 [8,]    8   15   25
+//		 [9,]   10   23   40
+		
+		
+		double[] series = { 1,5,10,20,-2,-3,4,8,10,15,23,25,40 };
+		double[][] rec = MyUtils.embedd(series, 2, 3);
+		MyUtils.print_matrix(rec);
+	}
+	
+	@Test
+	public void testRange() {
+		int[] seq = MyUtils.range(1, 20, 3);
+		int[] expected = {1, 4, 7, 10, 13, 16, 19};
+		assertEquals(expected.length, seq.length);
+		
+		for(int i = 0; i < expected.length; i++)
+			assertEquals(expected[i], seq[i]);
+	}
+	
+	@Test
 	public void testFastPrim() {
 		double[][] data = new double[][] { {1., 2}, {3, 4}, {0, -1}, {3,6}, {7,8}, {9,10}, {-2,3}};
 		int[][] mst = MyUtils.fastPrim(data);
