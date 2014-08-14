@@ -51,6 +51,88 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class MyUtils {
 	
+	/**
+	 * Compute the following scores for a binary classification
+	 * problem:
+	 * 
+	 * True positives;
+	 * True negatives;
+	 * False positives (Type I error);
+	 * False negatives (Type II error);
+	 * Recall (sensitivity or true positive rate);
+	 * Specificity (true negative rate);
+	 * Precision (positive predictive value);
+	 * Negative predictive value;
+	 * Fall-out (false positive rate);
+	 * False discovery rate;
+	 * Accuracy;
+	 * F1 Score;
+	 * Matthews correlation coefficient.
+	 * 
+	 * @see <a href="http://en.wikipedia.org/wiki/Precision_and_recall">Precision and recall</a>
+	 * @param expected the list of expected classification results (in true or false possibilities)
+	 * @param actual the classifier's predictions
+	 * @param printResults whether to print the results to stdout
+	 * @return the scores as an array
+	 */
+	public static double[] computeBinaryClassificationScores(
+			List<Boolean> expected, List<Boolean> actual,
+			boolean printResults) {
+		
+		double[] results = new double[13];
+		double tp = 0, tn = 0, fp = 0, fn = 0;
+		boolean ex, got;
+		
+		if (expected.size() != actual.size())
+			throw new RuntimeException("Expected and actual lists have a different size!");
+		
+		for (int i = 0; i < expected.size(); i++) {
+			ex = expected.get(i); got = actual.get(i); 
+			
+			if (ex == false && ex == got)
+				tn++;
+			else if (ex == false)
+				fp++;
+			else if (ex == true && ex == got)
+				tp++;
+			else
+				fn++;
+		}
+		
+		results[0] = tp; results[1] = tn; results[2] = fp; results[3] = fn;
+		results[4] = tp / (tp + fn); // recall
+		results[5] = tn / (fp + tn); // specificity
+		results[6] = tp / (tp + fp); // precision
+		results[7] = tn / (tn + fn); // negative predictive value
+		results[8] = fp / (fp + tn); // false positive rate
+		results[9] = fp / (fp + tp); // false discovery rate
+		results[10] = (tp + tn) / expected.size(); // accuracy
+		results[11] = (2.0 * tp) / (2.0 * tp + fp + fn); // f1 score
+		results[12] = (tp * tn - fp * fn) / Math.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)); // matthews
+		
+		if (printResults) {
+			printRep('-', 80);
+			String prec = "%.2f";
+			System.out.println("Score results:");
+			System.out.println("True positives: " + tp);
+			System.out.println("True negatives: " + tn);
+			System.out.println("False positives: " + fp);
+			System.out.println("False negatives: " + fn);
+			System.out.printf("Recall (or sensitivity or true positive rate): " + prec + "\n", results[4]);
+			System.out.printf("Specificity (true negative rate): " + prec + "\n",  results[5]);
+			System.out.printf("Precision (positive predictive value): " + prec + "\n", results[6]);
+			System.out.printf("Negative predictive value: " + prec + "\n",  results[7]);
+			System.out.printf("Fall-out (false positive rate): " + prec + "\n",  results[8]);
+			System.out.printf("False discovery rate: " + prec + "\n",  results[9]);
+			System.out.printf("accuracy: " + prec + "\n",  results[10]);
+			System.out.printf("F-1 score: " + prec + "\n",  results[11]);
+			System.out.printf("Matthews correlation coefficient (+1 perfect, 0 random, -1 total disagreement): " + prec + "\n",  results[12]);
+			printRep('-', 80);
+		}
+		
+		return results;
+	}
+	
 	private static double internalHausdorffAlg(double[][] x, double[][] y) {
 		double h = 0;
 		double dij, shortest;
