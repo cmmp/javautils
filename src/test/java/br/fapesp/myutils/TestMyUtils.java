@@ -20,13 +20,51 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
+import javax.swing.JFrame;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import weka.core.Instances;
 
 public class TestMyUtils {
+	
+	@Test
+	public void testAdjustedRandIndex() {
+		int[] got = new int[] {1, 2, 1, 1, 3, 2};
+		int[] expect = new int[] {1, 1, 2, 2, 3, 3};
+		
+		double ari = MyUtils.computeAdjustedRandIndex(got, expect);
+		
+		assertEquals(0.07407407, ari, 1e-5);
+	}
+	
+	@Test
+	@Ignore
+	public void testJFreeChart() {
+		double[][] data = new double[][] { {1, 2}, {3, 4}, {5,6} };
+		XYSeries xy = new XYSeries("Teste");
+		xy.add(1, 2);
+		xy.add(2,4);
+		xy.add(3,6);
+		
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		dataset.addSeries(xy);
+		
+		JFreeChart chart = ChartFactory.createScatterPlot("Scatter teste", "x", "y", dataset);
+			
+		ChartFrame frame =new ChartFrame("XYLine Chart",chart);
+		frame.pack();
+		frame.setVisible(true);
+	}
 	
 	@Test
 	public void testHausdorff() {

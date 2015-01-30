@@ -52,6 +52,41 @@ import au.com.bytecode.opencsv.CSVReader;
 public class MyUtils {
 	
 	/**
+	 * Computes the Adjusted Rand Index
+	 * @param labels
+	 * @param supervision
+	 * @return
+	 */
+	public static double computeAdjustedRandIndex(int[] labels, int[] supervision) {
+		double ARI = 0.0;
+		int N = labels.length;
+		
+		if (labels.length != supervision.length)
+			throw new RuntimeException("labels and supervision must have the same length!");
+		
+		double M = N * (N - 1) / 2.0; // number of pairs of points
+		
+		double a = 0; // number of pairs that belong to the same class and the same cluster
+		double b = 0; // number of pairs that belong to the same class but different clusters
+		double c = 0; // number of pairs that belong to different classes but the same cluster
+		
+		for (int i = 0; i < N - 1; i++) {
+			for (int j = i + 1; j < N; j++) {
+				if (supervision[i] == supervision[j] && labels[i] == labels[j])
+					a++;
+				if (supervision[i] == supervision[j] && labels[i] != labels[j])
+					b++;
+				if (supervision[i] != supervision[j] && labels[i] == labels[j])
+					c++;
+			}
+		}
+		
+		ARI = (a - ((a+c)*(a+b) / M)) / ( (((a+c)+(a+b)) / 2.0) - ((a+c)*(a+b) / M) );
+				
+		return ARI;
+	}
+	
+	/**
 	 * Compute the following scores for a binary classification
 	 * problem:
 	 * 
@@ -1155,6 +1190,28 @@ public class MyUtils {
 	public static void print_array(double[] array) {
 		System.out.println(arrayToString(array));
 	}
+	
+	/**
+	 * Print matrix with a nice formatting
+	 * @param matrix mat to be printed
+	 * @param fmt for instance, %.2f
+	 */
+	public static void print_matrix(double[][] matrix, String fmt) {
+		int nrows, ncols;
+		ncols = matrix[0].length;
+		nrows = matrix.length;
+
+		for (int i = 0; i < nrows; i++) {
+			for (int j = 0; j < ncols; j++) {
+				System.out.format(fmt, matrix[i][j]);
+				if(j + 1 < ncols)
+					System.out.print(" ");
+			}
+			System.out.print("\n");
+		}
+
+	}
+
 
 	public static void print_matrix(double[][] matrix) {
 		int nrows, ncols;
