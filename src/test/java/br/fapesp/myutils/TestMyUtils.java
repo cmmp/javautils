@@ -38,6 +38,17 @@ import weka.core.Instances;
 public class TestMyUtils {
 	
 	@Test
+	public void testJaccardIndex() {
+		int[] got = new int[] {1, 1, 1, 2, 2, 2, 3, 3};
+		int[] expect = new int[] {1, 1, 1, 1, 2, 2, 2, 2};
+		
+		double jaccard = MyUtils.jaccardIndex(got, expect);
+		
+		assertEquals(0.357142857142857, jaccard, 1e-5);
+	}
+	
+	
+	@Test
 	public void testAdjustedRandIndex() {
 		int[] got = new int[] {1, 2, 1, 1, 3, 2};
 		int[] expect = new int[] {1, 1, 2, 2, 3, 3};

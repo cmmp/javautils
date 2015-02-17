@@ -51,6 +51,44 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class MyUtils {
 	
+	/** 
+	 * Computes the Jaccard external clustering coefficient.
+	 * 0 - worst matching.
+	 * 1 - best clustering match.
+	 * 
+	 * @param labels obtained through clustering
+	 * @param supervision external labeling
+	 * @return index in the range [0,1]
+	 */
+	public static double jaccardIndex(int[] labels, int[] supervision) {
+		double jaccard = 0;
+		
+		if (labels.length != supervision.length)
+			throw new RuntimeException("labels and supervision must have the same length!");
+		
+		int N = labels.length;
+		double M = N * (N - 1) / 2.0; // number of pairs of points
+		
+		double a = 0; // number of pairs that belong to the same class and same cluster
+		double b = 0; // number of pairs that belong to the same class and diff clusters
+		double c = 0; // number of pairs that belong to diff classes and the same cluster
+		
+		for (int i = 0 ; i < N - 1; i++) {
+			for (int j = i + 1; j < N; j++) {
+				if (labels[i] == labels[j] && supervision[i] == supervision[j])
+					a++;
+				else if(labels[i] != labels[j] && supervision[i] == supervision[j])
+					b++;
+				else if(labels[i] == labels[j] && supervision[i] != supervision[j])
+					c++;
+			}
+		}
+	
+		jaccard = a / (a + b + c);
+		
+		return jaccard;
+	}
+	
 	/**
 	 * Computes the Adjusted Rand Index
 	 * @param labels
