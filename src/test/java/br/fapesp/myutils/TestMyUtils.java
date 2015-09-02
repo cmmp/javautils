@@ -20,6 +20,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -36,6 +37,18 @@ import org.junit.Test;
 import weka.core.Instances;
 
 public class TestMyUtils {
+	
+	@Test
+	public void testPercentileFromNbreaks() {
+		double[] exp1 = new double[]{25.0, 50.0, 75.0};
+		double[] got1 = MyUtils.computePercentilesFromNbreaks(3);
+		
+		double[] exp2 = new double[]{20.0, 40.0, 60.0, 80.0};
+		double[] got2 = MyUtils.computePercentilesFromNbreaks(4);
+		
+		assertArrayEquals(exp1, got1, 1e-5);
+		assertArrayEquals(exp2, got2, 1e-5);
+	}
 	
 	@Test
 	public void testJaccardIndex() {

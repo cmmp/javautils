@@ -51,6 +51,15 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class MyUtils {
 	
+	public static double[] computePercentilesFromNbreaks(int nbreaks) {
+		double[] percentiles = new double[nbreaks];
+		double step = 100.0 / (nbreaks + 1);
+		
+		for (int i = 0; i < nbreaks; i++)
+			percentiles[i] = step + i * step;
+		return percentiles;
+	}
+	
 	/** 
 	 * Computes the Jaccard external clustering coefficient.
 	 * 0 - worst matching.
