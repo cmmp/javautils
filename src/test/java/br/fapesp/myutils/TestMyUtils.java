@@ -39,6 +39,22 @@ import weka.core.Instances;
 public class TestMyUtils {
 	
 	@Test
+	public void testComputeBreaks() {
+		double[] exp1 = new double[]{12.5, 15, 17.5};
+		double[] got1 = MyUtils.computeBreaks(10,20,3);
+		
+		double[] exp2 = new double[]{25.0, 50.0, 75.0};
+		double[] got2 = MyUtils.computeBreaks(0,100,3);
+		
+		double[] exp3 = new double[]{15.0};
+		double[] got3 = MyUtils.computeBreaks(10,20,1);
+				
+		assertArrayEquals(exp1, got1, 1e-5);
+		assertArrayEquals(exp2, got2, 1e-5);
+		assertArrayEquals(exp3, got3, 1e-5);
+	}
+	
+	@Test
 	public void testPercentileFromNbreaks() {
 		double[] exp1 = new double[]{25.0, 50.0, 75.0};
 		double[] got1 = MyUtils.computePercentilesFromNbreaks(3);

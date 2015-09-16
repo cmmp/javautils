@@ -51,6 +51,15 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class MyUtils {
 	
+	public static double[] computeBreaks(double min, double max, int nbreaks) {
+		double[] breaks = new double[nbreaks];
+		double step = (max - min) / (nbreaks + 1);
+		
+		for (int i = 0; i < nbreaks; i++)
+			breaks[i] = min + step + i * step;
+		return breaks;
+	}
+	
 	public static double[] computePercentilesFromNbreaks(int nbreaks) {
 		double[] percentiles = new double[nbreaks];
 		double step = 100.0 / (nbreaks + 1);
