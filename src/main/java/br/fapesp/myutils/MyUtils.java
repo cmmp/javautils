@@ -51,6 +51,44 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public class MyUtils {
 	
+	/**
+	 * Compute the number of occurrences of each unique element
+	 * 
+	 * @param values array of values
+	 * @return a hashmap with the number of occurrences of each unique element
+	 */
+	public static HashMap<Integer, Integer> computeNumberOfOccurrences(int [] values) {
+		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+		
+		Object[] uvalues = getUniqueElements(values).toArray();
+		
+		int[] counts = new int[uvalues.length];
+		
+		for (int i = 0; i < uvalues.length; i++) {
+			int v = (Integer) uvalues[i];
+			for (int j = 0; j < values.length; j++)
+				if (values[j] == v)
+					counts[i]++;
+		}
+		
+		for (int i = 0; i < uvalues.length; i++) {
+			int v = (Integer) uvalues[i];
+			map.put(v, counts[i]);
+		}
+		
+		return map;
+	}
+	
+	/**
+	 * Compute breaks on a range. For instance, on the range [10,20], 
+	 * asking for 3 breaks returns {12.5, 15, 17.5}.
+	 * 
+	 * @param min lower bound
+	 * @param max upper bound
+	 * @param nbreaks number of breaks
+	 * 
+	 * @return computed breaks
+	 */
 	public static double[] computeBreaks(double min, double max, int nbreaks) {
 		double[] breaks = new double[nbreaks];
 		double step = (max - min) / (nbreaks + 1);
@@ -60,6 +98,13 @@ public class MyUtils {
 		return breaks;
 	}
 	
+	/**
+	 * Compute percentiles: 25, 50, 75, etc, given the number of
+	 * breaks desired.
+	 * 
+	 * @param nbreaks number of breaks
+	 * @return computed percentiles
+	 */
 	public static double[] computePercentilesFromNbreaks(int nbreaks) {
 		double[] percentiles = new double[nbreaks];
 		double step = 100.0 / (nbreaks + 1);
@@ -109,9 +154,9 @@ public class MyUtils {
 	
 	/**
 	 * Computes the Adjusted Rand Index
-	 * @param labels
-	 * @param supervision
-	 * @return
+	 * @param labels generated labels
+	 * @param supervision supervised labels
+	 * @return ARI value
 	 */
 	public static double computeAdjustedRandIndex(int[] labels, int[] supervision) {
 		double ARI = 0.0;
@@ -355,8 +400,8 @@ public class MyUtils {
 	
 	/**
 	 * Compute the squared euclidean distance between two doubles arrays
-	 * @param x
-	 * @param y
+	 * @param x array
+	 * @param y array
 	 * @return the *squared* euclidean distance
 	 */
 	public static double squaredEuclideanDistance(double[] x, double[] y) {
@@ -373,8 +418,8 @@ public class MyUtils {
 
     /**
      * Convert a list to an array
-     * @param list
-     * @return
+     * @param list original
+     * @return array
      */
     public static int[] listToArrayInt(List<Integer> list) {
         int[] array = new int[list.size()];
@@ -385,8 +430,8 @@ public class MyUtils {
 
     /**
 	 * Convert a list to an array
-	 * @param list
-	 * @return
+	 * @param list original
+	 * @return array
 	 */
 	public static double[] listToArray(List<Double> list) {
 		double[] array = new double[list.size()];
@@ -663,11 +708,11 @@ public class MyUtils {
 	
 	/**
 	 * Selecting a value from values array at random using the weights provided
-	 * @param values
+	 * @param values original array
 	 * @param weights MUST sum to 1.0
-	 * @param rng
-	 * @param seed
-	 * @return
+	 * @param rng rng object
+	 * @param seed if rng is null
+	 * @return randomly selected values
 	 */
 	public static int weightedValueRandomSelection(ArrayList<Integer> values, double[] weights, Random rng, long seed) {
 		if(Math.abs(MyUtils.sum(weights) - 1.0) > 0.01)
@@ -722,9 +767,9 @@ public class MyUtils {
 	/** 
 	 * Flip a coin using provided weights.
 	 * @param probTrue the probability the event is true 
-	 * @param rng
-	 * @param seed
-	 * @return
+	 * @param rng rng object
+	 * @param seed if rng null
+	 * @return true or false 
 	 */
 	public static boolean weightedCoinFlip(double probTrue, Random rng, long seed) {
 		Random r;
@@ -772,9 +817,9 @@ public class MyUtils {
 	
 	/**
 	 * Create an array of val repeated n times
-	 * @param val
-	 * @param n
-	 * @return
+	 * @param val value to repeat
+	 * @param n number of times
+	 * @return array of repeated values
 	 */
 	public static int[] repeat(int val, int n) {
 		int[] x = new int[n];
@@ -785,8 +830,8 @@ public class MyUtils {
 	
 	/**
 	 * Compute the sum of the array x
-	 * @param x
-	 * @return
+	 * @param x array
+	 * @return total sum
 	 */
 	public static double sum(double[] x) {
 		double sum = 0;
@@ -797,8 +842,8 @@ public class MyUtils {
 	
 	/**
 	 * Compute the sum of the array x
-	 * @param x
-	 * @return
+	 * @param x array
+	 * @return total sum
 	 */
 	public static int sum(int[] x) {
 		int sum = 0;
@@ -809,11 +854,11 @@ public class MyUtils {
 	
 	/**
 	 * Returns nsamples from values, chosen randomly _without_ replacement.
-	 * @param values
-	 * @param nsamples
+	 * @param values original array
+	 * @param nsamples number of samples
 	 * @param rng optional random number generator
 	 * @param seed if no rng is passed, create one with this seed
-	 * @return
+	 * @return sampled values
 	 */
 	public static double[] sampleWithoutReplacement(double[] values, int nsamples, Random rng, long seed) {
 		if (nsamples > values.length)
@@ -837,11 +882,11 @@ public class MyUtils {
 	
 	/**
 	 * Returns nsamples from values, chosen randomly _without_ replacement.
-	 * @param values
-	 * @param nsamples
+	 * @param values original array
+	 * @param nsamples number of samples
 	 * @param rng optional random number generator
 	 * @param seed if no rng is passed, create one with this seed
-	 * @return
+	 * @return sampled values
 	 */
 	public static int[] sampleWithoutReplacement(int[] values, int nsamples, Random rng, long seed) {
 		if (nsamples > values.length)
@@ -865,11 +910,11 @@ public class MyUtils {
 	
 	/**
 	 * Returns nsamples from values, chosen randomly _with_ replacement.
-	 * @param values
-	 * @param nsamples
+	 * @param values  original array
+	 * @param nsamples number of samples
 	 * @param rng optional random number generator
 	 * @param seed if no rng is passed, create one with this seed
-	 * @return
+	 * @return sampled values
 	 */
 	public static double[] sampleWithReplacement(double[] values, int nsamples, Random rng, long seed) {
 		Random r;
@@ -889,11 +934,11 @@ public class MyUtils {
 	
 	/**
 	 * Returns nsamples from values, chosen randomly _with_ replacement.
-	 * @param values
-	 * @param nsamples
+	 * @param values original array
+	 * @param nsamples number of samples
 	 * @param rng optional random number generator
 	 * @param seed if no rng is passed, create one with this seed
-	 * @return
+	 * @return sampled values
 	 */
 	public static int[] sampleWithReplacement(int[] values, int nsamples, Random rng, long seed) {
 		Random r;
@@ -971,7 +1016,7 @@ public class MyUtils {
 	 *            should class label be present? if true, the class is the m+1
 	 *            attribute
 	 * 
-	 * @return
+	 * @return instances object
 	 */
 	public static Instances genGaussianDataset(double[][] centers,
 			double[][] sigmas, int pointsPerCluster, long seed,
@@ -1031,9 +1076,9 @@ public class MyUtils {
 	 * Generates an integer sequence of the form (start, start+1, ..., start +
 	 * nsteps - 1)
 	 * 
-	 * @param start
-	 * @param nsteps
-	 * @return
+	 * @param start inclusive
+	 * @param nsteps number of steps
+	 * @return sequence
 	 */
 	public static int[] genIntSeries(int start, int nsteps) {
 		int[] series = new int[nsteps];
@@ -1046,9 +1091,9 @@ public class MyUtils {
 	/**
 	 * Generate an exponential series of the form: (base^1, ..., base^nsteps)
 	 * 
-	 * @param base
-	 * @param nsteps
-	 * @return
+	 * @param base baser of exp numbers
+	 * @param nsteps number of steps
+	 * @return sequence
 	 */
 	public static double[] genExpSeries(double base, int nsteps) {
 		double[] series = new double[nsteps];
@@ -1059,8 +1104,8 @@ public class MyUtils {
 	
 	/**
 	 * Creates an exponentially increasing sequence
-	 * @param start
-	 * @param end
+	 * @param start starting point
+	 * @param end ending point
 	 * @param n number of elements
 	 * @return An n-element sequence of exponentially increasing elements
 	 */
@@ -1112,9 +1157,9 @@ public class MyUtils {
 	/**
 	 * Find the minimum value in the column of a matrix
 	 * 
-	 * @param mat
-	 * @param col
-	 * @return
+	 * @param mat matrix
+	 * @param col which column
+	 * @return min value
 	 */
 	public static double getMinInCol(double[][] mat, int col) {
 		double min = Double.MAX_VALUE;
@@ -1127,9 +1172,9 @@ public class MyUtils {
 	/**
 	 * Find the maximum value in the column of a matrix
 	 * 
-	 * @param mat
-	 * @param col
-	 * @return
+	 * @param mat matrix
+	 * @param col which column
+	 * @return max value
 	 */
 	public static double getMaxInCol(double[][] mat, int col) {
 		double max = Double.MIN_VALUE;
@@ -1142,7 +1187,10 @@ public class MyUtils {
 	/**
 	 * Plot a matrix consisting of 0's and 1's.
 	 * 
-	 * @param map
+	 * @param map binary matrix
+	 * @param width image width
+	 * @param height image height
+	 * 
 	 */
 	public static void plotBinaryMatrix(final int[][] map, int width, int height) {
 		JFrame frame = new JFrame("Binary matrix plot");
@@ -1176,7 +1224,7 @@ public class MyUtils {
 	/**
 	 * Compute the Euclidean dissimilarity matrix on data
 	 * 
-	 * @param N data points in R^n
+	 * @param data N data points in R^n
 	 * @return an NxN matrix containing the Euclidean distance among points.
 	 */
 	public static double[][] getEuclideanMatrix(double[][] data) {
@@ -1197,7 +1245,7 @@ public class MyUtils {
 	
 	/**
 	 * Convert an Instances data set to a doubles matrix.
-	 * @param data
+	 * @param data instances object
 	 * @return data as a double array
 	 */
 	public static double[][] convertInstancesToDoubleMatrix(Instances data) {
@@ -1218,8 +1266,8 @@ public class MyUtils {
 	/**
 	 * Compute the Euclidean dissimilarity matrix on data
 	 * 
-	 * @param data
-	 * @return
+	 * @param data instances object
+	 * @return euclidean square matrix
 	 */
 	public static double[][] getEuclideanMatrix(Instances data) {
 		return (getEuclideanMatrix(convertInstancesToDoubleMatrix(data)));
@@ -1289,8 +1337,8 @@ public class MyUtils {
 	 * Find the index of the smallest element in fv. Assumes fv is a list of
 	 * doubles.
 	 * 
-	 * @param fv
-	 * @return
+	 * @param fv vector
+	 * @return minimum
 	 */
 	public static int argMin(FastVector fv) {
 		double min = Double.MAX_VALUE;

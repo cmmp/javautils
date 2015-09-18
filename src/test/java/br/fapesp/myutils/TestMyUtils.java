@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -37,6 +38,22 @@ import org.junit.Test;
 import weka.core.Instances;
 
 public class TestMyUtils {
+	
+	@Test
+	public void testCountOccurrences() {
+		int[] values = new int[]{0, 0, 0, 0, 1 , 2, 2, 3, 4, 8, 8, 8};
+		
+		HashMap<Integer, Integer> map = MyUtils.computeNumberOfOccurrences(values);
+				
+		assertEquals(4, (int) map.get(0));
+		assertEquals(1, (int) map.get(1));
+		assertEquals(2, (int) map.get(2));
+		assertEquals(1, (int) map.get(3));
+		assertEquals(1, (int) map.get(4));
+		assertEquals(3, (int) map.get(8));
+		
+		assertEquals(6, map.keySet().size());
+	}
 	
 	@Test
 	public void testComputeBreaks() {
